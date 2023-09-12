@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+        }
+        #response {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        p {
+            color: #333;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Voice Chatbot</h1>
+        <p>Click the button to start recording:</p>
+        <button id="record-button">Start Recording</button>
+        <div id="response">
+            <!-- Recognized text and response text will be displayed here -->
+        </div>
+    </div>
+    <script>
+        document.getElementById('record-button').addEventListener('click', function () {
+            fetch('/process_audio', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const audioResponse = data.audio_response;
+                    const audioElement = document.createElement('audio');
+                    audioElement.src = 'data:audio/mp3;base64,' + audioResponse;
+                    audioElement.controls = true;
+                    document.getElementById('response').appendChild(audioElement);
+
+                    // Display recognized text
+                    const recognizedText = document.createElement('p');
+                    recognizedText.innerHTML = `<strong>Recognized Text:</strong> ${data.recognized_text}`;
+                    document.getElementById('response').appendChild(recognizedText);
+
+                    // Display response text
+                    const responseText = document.createElement('p');
+                    responseText.innerHTML = `<strong>Response Text:</strong> ${data.response_text}`;
+                    document.getElementById('response').appendChild(responseText);
+                } else {
+                    document.getElementById('response').textContent = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('response').textContent = 'An error occurred.';
+            });
+        });
+    </script>
+</body>
+</html>
