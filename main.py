@@ -4,11 +4,13 @@ from gtts import gTTS
 import openai
 import speech_recognition as sr
 import base64,tempfile
-from decouple import config
-
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-openai.api_key = config('openai.api_key')
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+
 
 
 @app.route('/')
